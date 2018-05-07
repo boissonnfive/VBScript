@@ -404,6 +404,100 @@ End Sub
 
 
 '------------------------------------------------------------------------------
+' Nom              : Banniere
+' Description      : Affiche le message en majuscule centré et encadré.
+' sMessage         : Message à afficher.
+' nLargeurBanniere : Largeur autorisée du texte.
+'------------------------------------------------------------------------------
+
+
+' +-------------------------------------------------------------------+
+' |    BANNIERE.VBS - VERSION 0.1 - BRUNO BOISSONNET - 24/09/2015     |
+' |        AFFICHE LE MESSAGE EN MAJUSCULE CENTRÉ ET ENCADRÉ.         |
+' +-------------------------------------------------------------------+
+
+Sub Banniere(ByVal sMessage, ByVal nLargeurBanniere)
+
+    Dim sOutput, nEspace, sTrait, nSautDeLigne, sLigne, nNouvelleTailleDuMessage, nCompteur, nReste
+    
+    nCompteur = 0
+    ' Création d'un trait de la forme : +--------- ... ---------+
+    sTrait = "+" & String(nLargeurBanniere, "-") & "+"
+    sOutput = vbCRLF & sTrait & vbCRLF
+
+    ' On vérifie que la chaîne ne soit pas sur plusieurs ligne
+    
+    Do
+        nSautDeLigne = InStr(sMessage, vbCRLF)
+        ' WScript.Echo "nSautDeLigne = " & nSautDeLigne
+        ' On vérifie que le message ne soit pas plus long que la largeur de la bannière
+        If ( Len(sMessage) > nLargeurBanniere) Then
+            ' WScript.Echo "La longueur du message est supérieur à la largeur de la bannière (" & Len(sMessage) & ">" & nLargeurBanniere & ")."
+
+            ' On coupe le message en 2 lignes s'il n'y a pas déjà une ligne dedans
+            If (nSautDeLigne = 0) Then
+                sMessage = Left(sMessage, nLargeurBanniere - 1) & vbCRLF & Right(sMessage, Len(sMessage) - nLargeurBanniere + 1)
+                ' WScript.echo "sMessage = " & sMessage
+                nSautDeLigne = InStr(sMessage, vbCRLF)
+                ' WScript.Echo "Nouveau nSautDeLigne = " & nSautDeLigne
+            End If
+        End If
+
+        ' On vérifie que la première ligne du message ne soit pas plus longue que la largeur de la bannière
+        
+        If ( nSautDeLigne > nLargeurBanniere ) Then
+            ' WScript.Echo "Erreur : la longueur d'une ligne du message est supérieure à la largeur de la bannière (" & nSautDeLigne & ">" & nLargeurBanniere & ")."
+            sMessage = Left(sMessage, nLargeurBanniere - 1) & vbCRLF & Right(sMessage, Len(sMessage) - nLargeurBanniere + 1)
+            ' WScript.echo "sMessage = " & sMessage
+            nSautDeLigne = InStr(sMessage, vbCRLF)
+            ' WScript.Echo "Nouveau nSautDeLigne = " & nSautDeLigne
+            ' Exit Do
+        End If
+
+
+        ' Else
+            ' Par défaut, on considère que le message n'est que sur une ligne
+            sLigne = sMessage 
+            ' Si un saut de ligne a été trouvé
+            If nSautDeLigne <> 0 Then
+                ' On récupère la chaîne avant le saut de ligne
+                sLigne = Left(sMessage, nSautDeLigne - 1) ' -1 pour ne pas prendre le saut de ligne
+                ' WScript.Echo "sLigne = " & sLigne
+    
+                ' On enlève cette chaîne et le saut de ligne du message
+                nNouvelleTailleDuMessage = Len(sMessage) - nSautDeLigne - 1
+                sMessage = Right(sMessage, nNouvelleTailleDuMessage)
+                ' WScript.Echo "sMessage = " & sMessage
+            End If
+
+            nEspace = (nLargeurBanniere - Len(sLigne)) \ 2
+            ' S'il y a un reste à la division, il faudra ajouter une espace à droite
+            nReste = (nLargeurBanniere - Len(sLigne)) Mod 2
+            sLigne = "|" & Space(nEspace) & sLigne & Space(nReste) & Space(nEspace) & "|" 
+            sOutput = sOutput & UCase(sLigne) & vbCRLF
+        ' End If
+        nCompteur = nCompteur + 1
+        If (nCompteur > 15) Then
+            Exit Do
+        End IF
+    Loop While ( nSautDeLigne <> 0 )
+
+
+    ' Centrage du message en ajoutant des espaces et des barres verticales :
+    ' |     ... MESSAGE ...        |
+    ' nEspace = (nLargeurBanniere - Len(sMessage)) \ 2
+    ' sMessage = "|" & Space(nEspace) & sMessage & Space(nEspace) & "|" 
+
+    ' sOutput = sOutput & UCase(sMessage) & vbCRLF
+    sOutput = sOutput & sTrait & vbCRLF
+
+    WScript.Echo(sOutput)
+
+End Sub
+
+
+
+'------------------------------------------------------------------------------
 ' Nom                : RenommeFichier
 ' Description        : Renomme le fichier passé en paramètre
 ' sCheminFichier     : Chemin du fichier à renommer.
@@ -449,3 +543,74 @@ End Sub
         WScript.echo "Le fichier n'existe pas."
         WScript.Quit
     End If
+
+
+
+' ------------------------------------------------------------------------
+'        FONCTIONS EXISTANTES RECODÉES PAR MOI POUR APPRENDRE
+' ------------------------------------------------------------------------
+
+
+' ----
+' NomDossierScript
+' Renvoie le nom complet du dossier contenant le script
+' sans antislash à la fin
+' ---
+Function NomDossierScript
+
+Dim nLongueurNomDossier 
+
+' Pour récupérer le dossier du script
+' 1. On calcule la longueur de la chaîne représentant le nom du dossier
+' C'est la taille totale moins la taille du nom du script
+nLongueurNomDossier = Len(WScript.ScriptFullName)  - Len(WScript.ScriptName)
+
+' 2. On récupère cette longueur de chaîne dans le nom du script complet, en partant de la gauche (on enlève 1 pour ne pas prendre l'antislash)
+NomDossierScript = Left(WScript.ScriptFullName, nLongueurNomDossier -1 )
+
+End Function
+
+
+' ---
+' NomDossierContenant
+' Renvoie le nom complet du dossier contenant à partir du nom complet
+' et du nom du fichier.
+' sans antislash à la fin
+' ---
+Function NomDossierContenant(sNomComplet, sNom)
+
+Dim nLongueurNomDossier 
+
+' Pour récupérer le dossier contenant
+' 1. On calcule la longueur de la chaîne représentant le nom du dossier
+' C'est la taille totale moins la taille du nom du fichier
+nLongueurNomDossier = Len(sNomComplet)  - Len(sNom)
+
+' 2. On récupère cette longueur de chaîne dans le nom complet, en partant de la gauche (on enlève 1 pour ne pas prendre l'antislash)
+NomDossierContenant = Left(sNomComplet, nLongueurNomDossier -1 )
+
+End Function
+
+
+' ---
+' NomFichier
+' Renvoie le nom du fichier à partir de son nom complet.
+' ---
+Function NomFichier(sNomComplet)
+
+Dim nPositionDernierAntiSlash, nLongueurNomFichier 
+
+' Pour récupérer le nom du fichier
+' 1. On récupère la position du dernier antislash
+' C'est la taille totale moins la taille du nom du fichier
+nPositionDernierAntiSlash  = InStrRev(sNomComplet, "\")
+
+' 2. On calcule la longueur du nom du fichier à partir cette position
+nLongueurNomFichier = Len(sNomComplet) - (nPositionDernierAntiSlash)
+
+' 3. On récupère la chaîne de cette longueur à partir de la droite
+NomFichier = Right(sNomComplet, nLongueurNomFichier)
+
+End Function
+
+
