@@ -32,6 +32,23 @@ Tout code placé entre un `'` et une fin de ligne est considéré comme un comme
     maVariable = 2+3*24  ' Affectation du résultat de 2+3*24 à maVariable
 
 
+### Les types des variables
+
+    Dim ArrayVar(4), MyType
+    NullVar = Null   ' Assign Null value.
+    
+    MyType = TypeName("VBScript")   ' Returns "String".
+    WScript.Echo "MyType = " & MyType
+    MyType = TypeName(4)            ' Returns "Integer".
+    WScript.Echo "MyType = " & MyType
+    MyType = TypeName(37.50)        ' Returns "Double".
+    WScript.Echo "MyType = " & MyType
+    MyType = TypeName(NullVar)      ' Returns "Null".
+    WScript.Echo "MyType = " & MyType
+    MyType = TypeName(ArrayVar)     ' Returns "Variant()".
+    WScript.Echo "MyType = " & MyType
+
+
 ### Les noms des variables
 
 - Ne sont pas sensibles à la casse.
@@ -50,6 +67,16 @@ Tout code placé entre un `'` et une fin de ligne est considéré comme un comme
 - Accès               : element = Tableau(3) (element prend la valeur du 4ème élément de tableau)
 - Modification        : Tableau(0) = "coucou" (met coucou dans le 1er élément du tableau)
 - Taille d'un tableau : nTaille = UBound(Tableau) (taille vaut 11)
+
+
+    Marc = Array("garçon", "lunettes", "bruns")
+    Marine = Array("fille", "lunettes", "bruns")
+    Bruno = Array("garçon", "pas de lunettes", "bruns")
+    
+    Suspects = Array(Marc, Marine, Bruno)
+    
+    Coupable = Suspects(Random(3))
+
 
 
 ### Les constantes ###
@@ -141,6 +168,11 @@ Tout code placé entre un `'` et une fin de ligne est considéré comme un comme
     WScript.Echo "Dossier parent du script : " & dossierParent("WScript.ScriptFullName)
 
 
+### Paramètres byVal et byRef
+
+À FAIRE
+
+
 
 ### Gérer des exceptions ###
 
@@ -189,12 +221,12 @@ Tout code placé entre un `'` et une fin de ligne est considéré comme un comme
 **Date au format court**
 
     aujourdHui = Now()
-    FormatDateTime(aujourdHui, vbShortDate) ' => 26/07/2016
+    FormatDateTime(aujourdHui, vbShortDate) ' => 26/07/2016  (vbShortDate = 2)
 
 **Date au format long**
 
     aujourdHui = Now()
-    FormatDateTime(aujourdHui, vbLongDate) ' => mardi 27 juillet 2016
+    FormatDateTime(aujourdHui, vbLongDate) ' => mardi 27 juillet 2016 (vbLongDate= 1)
 
 **Transforme une chaîne en date**
 
@@ -220,11 +252,17 @@ Tout code placé entre un `'` et une fin de ligne est considéré comme un comme
 
 ### Les chaînes de caractères (String) ###
 
-- InStr(str1, str2)  : recherche str2 dans str1 et renvoie la position
-- Split(str1, str2)  : découpe str1 en chaînes séparées par str2 (renvoie une collection)
+- InStr(str1, str2)     : recherche str2 dans str1 et renvoie la position
+- Split(str1, str2)     : découpe str1 en chaînes séparées par str2 (renvoie une collection)
 - str = Replace(strInit, strFind, strReplace) : renvoie la chaîne remplacée
-- UCase(str1)        : met str1 en majuscule
-- LCase(str1)        : met str1 en minuscule
+- UCase(str1)           : met str1 en majuscule
+- LCase(str1)           : met str1 en minuscule
+- Mid(string,deb,count) : renvoi la chaîne qui commence à deb et a count caractères
+- Chr(nombre)           : renvoi le caractère ASCII correspondant au nombre
+- Asc(lettre)           : renvoi le code ASCII correspondant à la lettre
+
+    Wscript.Echo Asc(Mid("jour",1,1)) ' affiche 106 (j)
+    Wscript.Echo Chr(106)             ' affiche j
 
 **Ajout de guillemets dans une chaîne de caractères :**
 
@@ -265,7 +303,13 @@ Pour une meilleure lisibilité, on peut être amené à écrire une instruction 
 
 ## Cas pratiques ##
 
-### Nom complet du script : WScript.ScriptFullName
+### L'objet WScript
+
+- Nom de l'hôte du script : `WScript.Name`
+- Nom complet de l'exécutable de l'hôte du script : `WScript.FullName`
+- Nom complet du script : `WScript.ScriptFullName`
+- Nom du fichier script : `WScript.ScriptName`
+
 
 ### Répertoire courant (du script)
 
