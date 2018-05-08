@@ -498,6 +498,75 @@ End Sub
 
 
 '------------------------------------------------------------------------------
+' Nom            : AdresseIP
+' Description    : Renvoie l'adresse IP.
+' retour         : Renvoie l'adresse IP de la carte connectée. "" sinon.
+'------------------------------------------------------------------------------
+
+public function AdresseIP()
+   On Error Resume Next
+   dim objWMIService, objColItems, objItem, strIP
+   
+   strIP = ""
+
+   ' On crée un objet carte réseau
+   'Set objNAC = GetObject("winmgmts:").InstancesOf("Win32_NetworkAdapterConfiguration")
+   set objWMIService = GetObject("winmgmts:\\" & "." & "\root\cimv2") 
+   set objColItems   = objWMIService.ExecQuery _ 
+                       ("Select * From Win32_NetworkAdapterConfiguration Where IPEnabled = True")
+
+   ' On parcours les propriétés de l'objet carte réseau
+   for each objItem in objColItems
+      ' On récupère l'adresse IP du PC
+      if isNull(objItem.IPAddress) Then
+         strIP = ""
+      else
+         strIP = objItem.IPAddress(0) 'adresse IPv4, IPv6 est dans (1)
+      end if 
+
+      exit for
+    next
+
+    AdresseIP = strIP
+end function
+
+
+
+'------------------------------------------------------------------------------
+' Nom            : AdresseMAC
+' Description    : Renvoie l'adresse MAC.
+' retour         : Renvoie l'adresse MAC de la carte connectée. "" sinon.
+'------------------------------------------------------------------------------
+
+public function AdresseMAC()
+   On Error Resume Next
+   dim objWMIService, objColItems, objItem, strMAC
+   
+   strMAC = ""
+
+   ' On crée un objet carte réseau
+   'Set objNAC = GetObject("winmgmts:").InstancesOf("Win32_NetworkAdapterConfiguration")
+   set objWMIService = GetObject("winmgmts:\\" & "." & "\root\cimv2") 
+   set objColItems   = objWMIService.ExecQuery _ 
+                       ("Select * From Win32_NetworkAdapterConfiguration Where IPEnabled = True")
+
+   ' On parcours les propriétés de l'objet carte réseau
+   for each objItem in objColItems
+      ' On récupère l'adresse IP du PC
+      if isNull(objItem.MACAddress) Then
+         strMAC = ""
+      else
+         strMAC = objItem.MACAddress
+      end if 
+
+      exit for
+    next
+
+    AdresseMAC = strMAC
+end function
+
+
+'------------------------------------------------------------------------------
 ' Nom                : RenommeFichier
 ' Description        : Renomme le fichier passé en paramètre
 ' sCheminFichier     : Chemin du fichier à renommer.
