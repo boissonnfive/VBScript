@@ -447,6 +447,7 @@ Il y a 3 modes d'affichages :
 - Scripting Guidelines : <https://technet.microsoft.com/en-us/library/ee198686.aspx>
 - Scripting Concepts and Technologies for System Administration : <https://technet.microsoft.com/en-us/library/ee176762.aspx>
 - Entreprise Script : <https://technet.microsoft.com/en-us/library/ee176576.aspx>
+- Quand utiliser des parenthèses : <https://blogs.msdn.microsoft.com/ericlippert/2003/09/15/what-do-you-mean-cannot-use-parentheses/>
 
 
 ### WSH Object ("WScript") ###
