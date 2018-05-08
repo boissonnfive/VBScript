@@ -271,6 +271,12 @@ Tout code placé entre un `'` et une fin de ligne est considéré comme un comme
     strParameters = "mspaint.exe " & chr(34) & JPGFileName & chr(34)
 
 
+**Sauts de ligne :**
+
+- `Chr(34)`
+- `vbNewLine`
+- `vbCRLF`
+
 
 ### Changer l'interpréteur de commandes ###
 
