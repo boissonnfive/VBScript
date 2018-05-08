@@ -32,7 +32,9 @@ Contient les fonctions que j'ai créées.
 - AdresseIP : Renvoie l'adresse IP.
 - AdresseMAC : Renvoie l'adresse MAC.
 - RenommeFichier : Renomme le fichier passé en paramètre
-- 
+- ModeleOrdinateur : Renvoie le modèle de l'ordinateur
+
+
 
 **À faire :**
 

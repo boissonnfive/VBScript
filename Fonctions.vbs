@@ -548,6 +548,31 @@ end function
 
 
 '------------------------------------------------------------------------------
+' Nom         : ModeleOrdinateur
+' Description : Renvoie le modèle de l'ordinateur
+' retour      : Le modèle de l'ordinateur
+'------------------------------------------------------------------------------
+
+Function ModeleOrdinateur()
+ 
+   ' Déclaration des variables obligatoire
+  Dim SystemName, objComputerSystem, ordinateur, retour
+  SystemName = "localhost"
+  
+  set objComputerSystem = GetObject("winmgmts:{impersonationLevel=impersonate}!\\" &_
+  SystemName & "\root\cimv2").InstancesOf ("Win32_ComputerSystem")
+  for each ordinateur in objComputerSystem
+    retour = trim(ordinateur.Manufacturer) & " " & trim(ordinateur.Model)
+  Next
+  
+  Set objComputerSystem = Nothing
+  Set ordinateur        = Nothing
+  ModeleOrdinateur      = retour
+   
+End Function
+
+
+'------------------------------------------------------------------------------
 ' Nom                : RenommeFichier
 ' Description        : Renomme le fichier passé en paramètre
 ' sCheminFichier     : Chemin du fichier à renommer.
