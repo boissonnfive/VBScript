@@ -573,6 +573,141 @@ End Function
 
 
 '------------------------------------------------------------------------------
+' Nom                : SelectionneFichierDansExplorateur
+' Description        : Met le fichier en surbrillance dans l'explorateur.
+' sNomCompletFichier : Chemin complet du fichier.
+'------------------------------------------------------------------------------
+
+Public Sub SelectionneFichierDansExplorateur(sNomCompletFichier)
+    dim objWShell
+    dim objShell
+    dim objFolder
+    dim objShellWindows
+    dim sDossierParent
+    dim sNomFichier
+
+
+    set objWShell     = CreateObject("WScript.Shell")
+    set objShell      = CreateObject("shell.application")
+    set objFSO        = CreateObject("Scripting.FileSystemObject")
+    
+    sDossierParent    = objFSO.GetParentFolderName(sNomCompletFichier)
+    sNomFichier       = objFSO.GetFileName(sNomCompletFichier)
+    sNomDossierParent = objFSO.GetBaseName(sDossierParent)
+    objFolder         = objShell.NameSpace(sDossierParent)
+    
+
+    ' WScript.Echo "Nom du fichier à sélectionner : " & vbCRLF & sNomFichier
+    ' WScript.Echo "Nom du dossier parent : " & vbCRLF & sNomDossierParent
+
+    
+    ' WScript.Echo "Récupération de la fenêtre explorateur ..."
+    
+    set objShellWindows = objShell.Windows
+
+    if (not objShellWindows is nothing) then
+        
+        ' WScript.Echo "Il y a " & objShellWindows.Count & " fenêtres ouvertes."
+        For j=0 to objShellWindows.Count-1
+          ' WScript.Echo "Nom de la fenêtre :" & vbCRLF & objShellWindows.Item(j).LocationName & vbCRLF & objShellWindows.Item(j).LocationURL
+
+            If objShellWindows.Item(j).LocationName = sNomDossierParent Then
+
+                ' WScript.Echo "Fenêtre trouvée !"
+
+                set objShellFolderView = objShellWindows.Item(j).Document
+                ' objShellFolderView.focus()
+    
+                For k=0 to objShellFolderView.Folder.Items.Count-1
+    
+                    ' WScript.Echo "Nom de l'élément :" & vbCRLF & objShellFolderView.Folder.Items.Item(k).Name
+
+                    If objShellFolderView.Folder.Items.Item(k).Name = sNomFichier Then
+
+                        objShellFolderView.SelectItem objShellFolderView.Folder.Items.Item(k),21
+                        
+                    End If
+                Next
+
+            End If
+        Next
+
+    end if
+
+    set objWShell = nothing
+    set objShell  = nothing
+    set objFSO    = nothing
+
+end Sub
+
+
+'------------------------------------------------------------------------------
+' Nom           : AfficheDansExplorateur
+' Description   : Ouvre le dossier spécifié dans l'explorateur Windows.
+' cheminDossier : Chemin complet du dossier.
+'------------------------------------------------------------------------------
+
+Public sub AfficheDansExplorateur(cheminDossier)
+    ' On Error Resume Next
+    Dim objShell, strExplorerPath
+    Set objShell = CreateObject("Wscript.Shell")
+    If Err.Number <> 0 Then
+        ' WScript.Echo "Erreur lors de la création de l'objet WScript.Shell." & vbNewLine & " (Numéro: " & Err.Number & ", Description: " & Err.Description & ")"
+        ' Err.Clear
+    Else
+    strExplorerPath = "explorer.exe /e," & cheminDossier
+      objShell.Run strExplorerPath, , True
+        Set objShell = Nothing
+        WScript.Sleep 1500 ' Laisse le temps à la fenêtre de s'afficher
+    End If
+end sub
+
+'------------------------------------------------------------------------------
+' Nom           : AfficheDansExplorateur2
+' Description   : Ouvre le dossier spécifié dans l'explorateur Windows.
+' cheminDossier : Chemin complet du dossier.
+'------------------------------------------------------------------------------
+
+Public sub AfficheDansExplorateur2(cheminDossier)
+    ' On Error Resume Next
+    dim objShellAPP
+    set objShellAPP = CreateObject("shell.application")
+    objShellAPP.Explore(cheminDossier)
+    set objShellAPP = Nothing
+    WScript.Sleep 1500 ' Laisse le temps à la fenêtre de s'afficher
+end sub
+
+
+'------------------------------------------------------------------------------
+' Nom           : CloseExplorerWindow
+' Description   : Ferme le dossier spécifié dans l'explorateur Windows.
+' sFolderPath   : Chemin complet du dossier.
+'------------------------------------------------------------------------------
+
+Function CloseExplorerWindow(sFolderPath)
+    Dim bTest
+
+    bTest = false
+    with createobject("shell.application")
+                
+        ' for each wndw in .windows
+        For j=0 to .windows.Count-1
+            ' if typename(wndw.document) = "IShellFolderViewDual2" then
+            
+            if lcase(.windows.Item(j).document.folder.self.path) = lcase(sFolderPath) then
+                .windows.Item(j).quit
+                bTest = err.number = 0
+            end if
+            ' end if
+        next
+    
+    end with ' shell.application
+    CloseExplorerWindow = Cstr(bTest)
+end function
+
+
+
+'------------------------------------------------------------------------------
 ' Nom                : RenommeFichier
 ' Description        : Renomme le fichier passé en paramètre
 ' sCheminFichier     : Chemin du fichier à renommer.
