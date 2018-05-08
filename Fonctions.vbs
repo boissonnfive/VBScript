@@ -1,20 +1,16 @@
-' Scripts VBScript
+'+----------------------------------------------------------------------------+
+'| Fichier     : Fonction.vbs                                                 |
+'+----------------------------------------------------------------------------+
+'| Version     : 0.1                                                          |
+'+----------------------------------------------------------------------------+
+'| Description : Contient les fonctions que j'ai créées.                      |
+'+----------------------------------------------------------------------------+
 
 
-' Le fichier de trace doit être fourni en argument pour indiquer si le script doit
-' être lancé en console ou en graphique.
 
-' Créer un script qui ajoute "TOut le monde" dans le groupe administrateur.
-
-
-'------------------------------------------------------------------------------
-' Sauts de ligne :
-'------------------------------------------------------------------------------
-
-' WScript.Echo "Saut de ligne : " & Chr(34)
-' WScript.Echo "Saut de ligne : " & vbNewLine
-' WScript.Echo "Saut de ligne : " & vbCRLF
-
+'+----------------------------------------------------------------------------+
+'|                               TESTS                                        |
+'+----------------------------------------------------------------------------+
 
 
 ' DateDerniereModification()
@@ -40,6 +36,9 @@
 
 
 
+'+----------------------------------------------------------------------------+
+'|                            FONCTIONS                                       |
+'+----------------------------------------------------------------------------+
 
 
 
@@ -51,7 +50,7 @@
 '------------------------------------------------------------------------------
 
 Function DossierParent(cheminFichierOuDossier)
-Dim objFSO
+    Dim objFSO
 
     Set objFSO = CreateObject("Scripting.FileSystemObject")
     
@@ -59,30 +58,12 @@ Dim objFSO
 
 End Function
 
-'------------------------------------------------------------------------------
-' Parcours le contenu d'un dossier. Si les fichiers ont l'extension .vbs, 
-' on affiche la date de dernière modification.
-'------------------------------------------------------------------------------
-
-Public sub DateDerniereModification()
-
-    Set objFSO = CreateObject("Scripting.FileSystemObject")
-    set bubu = objFSO.GetFolder(objFSO.GetParentFolderName(WScript.ScriptFullName)).Files
-    
-    For each elt in bubu
-    	' Wscript.echo objFSO.GetExtensionName(elt.Name)
-    	If objFSO.GetExtensionName(elt.Name) = "vbs" Then
-    		WScript.Echo elt.Name & "(" & elt.DateLastModified & ")"
-    	Else
-    		WScript.echo "..."
-    	End If
-    Next
-End Sub
 
 
 '------------------------------------------------------------------------------
-' Parcours les disques de l'ordinateur et affiche des infos :
-' Lettre, Nom, Espace libre, système de fichier
+' Nom         : AfficheInfosDisques
+' Description : Affiche les infos des disques de l'ordinateur
+' Remarque    : Lettre, Nom, Espace libre, système de fichier
 '------------------------------------------------------------------------------
 
 Public sub AfficheInfosDisques()
@@ -102,50 +83,32 @@ Public sub AfficheInfosDisques()
 
 End Sub
 
-'------------------------------------------------------------------------------
-' Lit le contenu d'un fichier
-' Applique un traitement sur le contenu
-' Écrit dans un autre fichier
-'------------------------------------------------------------------------------
 
 
 Public sub SupprimeHTMLDuFichier(cheminFichier)
 
-Dim strFileContents
-Const ForAppending = 8
-Dim strNewFileName
-
-' Read the total content of the html file and put it in strFileContents
-Set objFSO = CreateObject("Scripting.FileSystemObject")
-Set objTS = objFSO.OpenTextFile(cheminFichier)
-strFileContents = objTS.ReadAll
-objTS.Close
-
-' Write the result of function in the file idem.txt
-Set objFile = objFSO.GetFile(cheminFichier)
-
-strNewFileName = objFSO.GetParentFolderName(objFile) & "\" & objFSO.GetBaseName(objFile) & ".txt"
-
-Set objTextFile = objFSO.OpenTextFile(strNewFileName, ForAppending, True)
-
-objTextFile.Write(StripHTML(strFileContents))
-
-objTextFile.Close
+  Dim strFileContents
+  Const ForAppending = 8
+  Dim strNewFileName
+  
+  ' Read the total content of the html file and put it in strFileContents
+  Set objFSO = CreateObject("Scripting.FileSystemObject")
+  Set objTS = objFSO.OpenTextFile(cheminFichier)
+  strFileContents = objTS.ReadAll
+  objTS.Close
+  
+  ' Write the result of function in the file idem.txt
+  Set objFile = objFSO.GetFile(cheminFichier)
+  
+  strNewFileName = objFSO.GetParentFolderName(objFile) & "\" & objFSO.GetBaseName(objFile) & ".txt"
+  
+  Set objTextFile = objFSO.OpenTextFile(strNewFileName, ForAppending, True)
+  
+  objTextFile.Write(StripHTML(strFileContents))
+  
+  objTextFile.Close
 
 End Sub
-
-
-Function LitFichier(cheminFichier)
-Dim strFileContents
-    ' Read the total content of the html file and put it in strFileContents
-    Set objFSO = CreateObject("Scripting.FileSystemObject")
-    Set objTS = objFSO.OpenTextFile(cheminFichier)
-    strFileContents = objTS.ReadAll
-    objTS.Close
-    LitFichier = strFileContents
-End Function
-
-
 
 
 '------------------------------------------------------------------------------
@@ -161,6 +124,24 @@ Dim oReg
     oReg.Pattern = "(<[^>]+>)"
     oReg.Global = True
     StripHTML = oReg.Replace(sTexteHTML, vbNullString)
+End Function
+
+
+'------------------------------------------------------------------------------
+' Nom           : LitFichier
+' Description   : Lit le contenu d'un fichier
+' cheminFichier : le nom complet du fichier à lire
+' retour        : Renvoie le contenu du fichier
+'------------------------------------------------------------------------------
+
+Function LitFichier(cheminFichier)
+    Dim strFileContents
+    ' Read the total content of the html file and put it in strFileContents
+    Set objFSO = CreateObject("Scripting.FileSystemObject")
+    Set objTS = objFSO.OpenTextFile(cheminFichier)
+    strFileContents = objTS.ReadAll
+    objTS.Close
+    LitFichier = strFileContents
 End Function
 
 
@@ -184,13 +165,21 @@ Public Sub Beep()
    Set objSpFileStream = Nothing
 End Sub
 
-' Émet le son d'alerte Windows par défaut (ce n'est pas un bip)
-' Ne fonctionne que si le script est lancé par cscript'
+'------------------------------------------------------------------------------
+' Nom         : Bip
+' Description : Émet le son d'alerte Windows par défaut (ce n'est pas un bip).
+' Remarque    : Ne fonctionne que si le script est lancé par cscript
+'------------------------------------------------------------------------------
+
 Sub Bip
    WScript.Echo Chr(7)
 End Sub
 
-' Émet le son d'alerte Windows par défaut (ce n'est pas un bip)
+'------------------------------------------------------------------------------
+' Nom         : Biip
+' Description : Émet le son d'alerte Windows par défaut (ce n'est pas un bip).
+'------------------------------------------------------------------------------
+
 Sub Biip
    CreateObject("WScript.Shell").Run "%comspec% /K echo " & Chr(07),0  'O: cache la fenêtre
 End Sub
@@ -239,7 +228,7 @@ end sub
 
 '------------------------------------------------------------------------------
 ' Nom           : Parle
-' Description   : Parle le texte en paramètre.
+' Description   : Fait dire le texte en paramètre par l'ordinateur.
 ' strTexte      : Texte à faire parler par l'ordinateur.
 '------------------------------------------------------------------------------
 
@@ -251,11 +240,13 @@ End Sub
 
 
 
-' ***
-' Nom      : DateDerniereModificationFichier
-' filespec : Chemin complet du fichier
-' retour   : Une date ou Empty s'il y a eu une erreur
-' ***
+'------------------------------------------------------------------------------
+' Nom           : DateDerniereModificationFichier
+' Description   : Renvoie la date de dernière modification du fichier (au format JJ/MM/AAAA)
+' filespec      : Chemin complet du fichier
+' Retour        : La date de dernière modification du fichier (au format JJ/MM/AAAA)
+'------------------------------------------------------------------------------
+
 Function DateDerniereModificationFichier(filespec)
    On Error Resume Next ' Emp�che les erreurs de s'afficher (� supprimer lors du d�bogage)
    Dim objFSO, objFile, retour, strErrMsg, result
@@ -276,10 +267,10 @@ End Function
 
 
 '------------------------------------------------------------------------------
-' Nom         : DisqueEstMonte
-' Description : Dit si un disque est monté
-' sLettreDisque  : Lettre correspondant au disque à tester
-' retour      : Renvoie True si le disque est monté, False sinon
+' Nom           : DisqueEstMonte
+' Description   : Dit si un disque est monté
+' sLettreDisque : Lettre correspondant au disque à tester
+' retour        : Renvoie True si le disque est monté, False sinon
 '------------------------------------------------------------------------------
 
 Function DisqueEstMonte(sLettreDisque)
@@ -296,7 +287,6 @@ End Function
 ' Description    : Affiche les infos du fichier (nom, extension, etc...)
 ' sCheminFichier : Chemin du fichier.
 '------------------------------------------------------------------------------
-
 
 Public Sub InfosFichier(sCheminFichier)
 
@@ -331,15 +321,12 @@ Public Sub TermineCheminParBarreOblique(sCheminFichier)
 End Sub
 
 
-
-
 '------------------------------------------------------------------------------
 ' Nom            : DossierEstVide
 ' Description    : Dit si un dossier est vide ou pas
 ' sCheminDossier : Chemin complet du dossier
 ' retour         : Renvoie True si le dossier est vide, False sinon
 '------------------------------------------------------------------------------
-
 
 Public Function DossierEstVide(sCheminDossier)
 
@@ -364,17 +351,13 @@ Public Function DossierEstVide(sCheminDossier)
 End Function
 
 
-
-
-
 '------------------------------------------------------------------------------
 ' Nom                 : Tracer
 ' Description         : Écrit dans un fichier le texte passé en paramètre.
 ' sCheminFichierTrace : Chemin du fichier de trace.
 ' sTexte              : texte à écrire dans le fichier de trace.
+' Exemple             : call Tracer("I:\vbs\adresses_mac.txt", "coucou")
 '------------------------------------------------------------------------------
-
-' call Tracer("I:\vbs\adresses_mac.txt", "coucou")
 
 Public Sub Tracer(sCheminFichierTrace, sTexte)
 
@@ -496,7 +479,6 @@ Sub Banniere(ByVal sMessage, ByVal nLargeurBanniere)
 End Sub
 
 
-
 '------------------------------------------------------------------------------
 ' Nom            : AdresseIP
 ' Description    : Renvoie l'adresse IP.
@@ -529,7 +511,6 @@ public function AdresseIP()
 
     AdresseIP = strIP
 end function
-
 
 
 '------------------------------------------------------------------------------
@@ -585,33 +566,33 @@ Public Sub RenommeFichier(sCheminFichier, sNomNouveauFichier)
 End Sub
 
 
-### Renommer un dossier ###
+' ### Renommer un dossier ###
 
-    Dim objFSO
-    Set objFSO = CreateObject("Scripting.FileSystemObject")
-    objFSO.MoveFolder "D:\PERSONNEL" , "D:\PERSO"          ' renomme
-    objFSO.MoveFolder "D:\PERSO" , "D:\INFORMATIQUE\"      ' déplace
-
-
-### Vérifier qu un dossier existe ###
-
-    strNomCompletDossier = "C:\Users\Bobo"
-    Set objFSO = CreateObject("Scripting.FileSystemObject")
-    If Not objFSO.FolderExists(strNomCompletDossier) Then
-        WScript.echo "Le dossier n'existe pas"
-        WScript.Quit
-    End If
+'     Dim objFSO
+'     Set objFSO = CreateObject("Scripting.FileSystemObject")
+'     objFSO.MoveFolder "D:\PERSONNEL" , "D:\PERSO"          ' renomme
+'     objFSO.MoveFolder "D:\PERSO" , "D:\INFORMATIQUE\"      ' déplace
 
 
-### Vérifier qu un fichier existe ###
+' ### Vérifier qu un dossier existe ###
 
-    strNomFichier = "bubu.txt"
-    strNomCompletDossier = "C:\Users\Bobo"
-    Set objFSO = CreateObject("Scripting.FileSystemObject")
-    If Not objFSO.FileExists(strNomCompletDossier & "\" & strNomFichier) Then
-        WScript.echo "Le fichier n'existe pas."
-        WScript.Quit
-    End If
+'     strNomCompletDossier = "C:\Users\Bobo"
+'     Set objFSO = CreateObject("Scripting.FileSystemObject")
+'     If Not objFSO.FolderExists(strNomCompletDossier) Then
+'         WScript.echo "Le dossier n'existe pas"
+'         WScript.Quit
+'     End If
+
+
+' ### Vérifier qu un fichier existe ###
+
+'     strNomFichier = "bubu.txt"
+'     strNomCompletDossier = "C:\Users\Bobo"
+'     Set objFSO = CreateObject("Scripting.FileSystemObject")
+'     If Not objFSO.FileExists(strNomCompletDossier & "\" & strNomFichier) Then
+'         WScript.echo "Le fichier n'existe pas."
+'         WScript.Quit
+'     End If
 
 
 
@@ -627,15 +608,15 @@ End Sub
 ' ---
 Function NomDossierScript
 
-Dim nLongueurNomDossier 
-
-' Pour récupérer le dossier du script
-' 1. On calcule la longueur de la chaîne représentant le nom du dossier
-' C'est la taille totale moins la taille du nom du script
-nLongueurNomDossier = Len(WScript.ScriptFullName)  - Len(WScript.ScriptName)
-
-' 2. On récupère cette longueur de chaîne dans le nom du script complet, en partant de la gauche (on enlève 1 pour ne pas prendre l'antislash)
-NomDossierScript = Left(WScript.ScriptFullName, nLongueurNomDossier -1 )
+    Dim nLongueurNomDossier 
+    
+    ' Pour récupérer le dossier du script
+    ' 1. On calcule la longueur de la chaîne représentant le nom du dossier
+    ' C'est la taille totale moins la taille du nom du script
+    nLongueurNomDossier = Len(WScript.ScriptFullName)  - Len(WScript.ScriptName)
+    
+    ' 2. On récupère cette longueur de chaîne dans le nom du script complet, en partant de la gauche (on enlève 1 pour ne pas prendre l'antislash)
+    NomDossierScript = Left(WScript.ScriptFullName, nLongueurNomDossier -1 )
 
 End Function
 
@@ -648,15 +629,15 @@ End Function
 ' ---
 Function NomDossierContenant(sNomComplet, sNom)
 
-Dim nLongueurNomDossier 
-
-' Pour récupérer le dossier contenant
-' 1. On calcule la longueur de la chaîne représentant le nom du dossier
-' C'est la taille totale moins la taille du nom du fichier
-nLongueurNomDossier = Len(sNomComplet)  - Len(sNom)
-
-' 2. On récupère cette longueur de chaîne dans le nom complet, en partant de la gauche (on enlève 1 pour ne pas prendre l'antislash)
-NomDossierContenant = Left(sNomComplet, nLongueurNomDossier -1 )
+    Dim nLongueurNomDossier 
+    
+    ' Pour récupérer le dossier contenant
+    ' 1. On calcule la longueur de la chaîne représentant le nom du dossier
+    ' C'est la taille totale moins la taille du nom du fichier
+    nLongueurNomDossier = Len(sNomComplet)  - Len(sNom)
+    
+    ' 2. On récupère cette longueur de chaîne dans le nom complet, en partant de la gauche (on enlève 1 pour ne pas prendre l'antislash)
+    NomDossierContenant = Left(sNomComplet, nLongueurNomDossier -1 )
 
 End Function
 
@@ -667,18 +648,18 @@ End Function
 ' ---
 Function NomFichier(sNomComplet)
 
-Dim nPositionDernierAntiSlash, nLongueurNomFichier 
-
-' Pour récupérer le nom du fichier
-' 1. On récupère la position du dernier antislash
-' C'est la taille totale moins la taille du nom du fichier
-nPositionDernierAntiSlash  = InStrRev(sNomComplet, "\")
-
-' 2. On calcule la longueur du nom du fichier à partir cette position
-nLongueurNomFichier = Len(sNomComplet) - (nPositionDernierAntiSlash)
-
-' 3. On récupère la chaîne de cette longueur à partir de la droite
-NomFichier = Right(sNomComplet, nLongueurNomFichier)
+    Dim nPositionDernierAntiSlash, nLongueurNomFichier 
+    
+    ' Pour récupérer le nom du fichier
+    ' 1. On récupère la position du dernier antislash
+    ' C'est la taille totale moins la taille du nom du fichier
+    nPositionDernierAntiSlash  = InStrRev(sNomComplet, "\")
+    
+    ' 2. On calcule la longueur du nom du fichier à partir cette position
+    nLongueurNomFichier = Len(sNomComplet) - (nPositionDernierAntiSlash)
+    
+    ' 3. On récupère la chaîne de cette longueur à partir de la droite
+    NomFichier = Right(sNomComplet, nLongueurNomFichier)
 
 End Function
 
