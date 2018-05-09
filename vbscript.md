@@ -24,7 +24,7 @@ Tout code placé entre un `'` et une fin de ligne est considéré comme un comme
 
 ### Déclaration et utilisation des variables (Dim et =) ###
 
-```vbscript
+```vb
 Option Explicit ' Force la déclaration des variables
 Dim maVariable
 maVariable = "Bruno" ' Une chaîne de caractères
