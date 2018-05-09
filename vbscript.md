@@ -24,13 +24,14 @@ Tout code placé entre un `'` et une fin de ligne est considéré comme un comme
 
 ### Déclaration et utilisation des variables (Dim et =) ###
 
-    Option Explicit ' Force la déclaration des variables
-    Dim maVariable
-    maVariable = "Bruno" ' Une chaîne de caractères
-    maVariable = 4       ' Un nombre
-    maVariable = Now()   ' Date et heure du jour
-    maVariable = 2+3*24  ' Affectation du résultat de 2+3*24 à maVariable
-
+```vbscript
+Option Explicit ' Force la déclaration des variables
+Dim maVariable
+maVariable = "Bruno" ' Une chaîne de caractères
+maVariable = 4       ' Un nombre
+maVariable = Now()   ' Date et heure du jour
+maVariable = 2+3*24  ' Affectation du résultat de 2+3*24 à maVariable
+```
 
 ### Les types des variables
 
