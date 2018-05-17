@@ -213,7 +213,7 @@ Tout code placé entre un `'` et une fin de ligne est considéré comme un comme
 
     aujourdHui = Now()
     WeekDayName(WeekDay(aujourdHui)) & " "_
-    & WeekDay(aujourdHui) & " "_
+    & Day(aujourdHui) & " "_
     & MonthName(Month(aujourdHui)) & " "_
     & Year(aujourdHui)
     => Samedi 5 septembre 2015
