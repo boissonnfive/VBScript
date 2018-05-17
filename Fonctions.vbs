@@ -573,6 +573,34 @@ End Function
 
 
 '------------------------------------------------------------------------------
+' Nom         : NomOrdinateur
+' Description : Renvoie le nom de l'ordinateur
+' retour      : Le nom de l'ordinateur
+'------------------------------------------------------------------------------
+
+function NomOrdinateur() 
+  On error resume next
+  dim objWMIService, objColItems, objItem, strComputer, strNomOrdinateur 
+
+  strComputer = "."
+
+  set objWMIService = GetObject("winmgmts:\\" & strComputer & "\root\cimv2") 
+  set objColItems   = objWMIService.ExecQuery _ 
+  ("Select * From Win32_NetworkAdapterConfiguration Where IPEnabled = True") 
+
+  for each objItem in objColItems
+    strNomOrdinateur = objItem.dnshostname
+    exit for
+  next
+
+  NomOrdinateur = strNomOrdinateur
+
+end function
+
+
+
+
+'------------------------------------------------------------------------------
 ' Nom                : SelectionneFichierDansExplorateur
 ' Description        : Met le fichier en surbrillance dans l'explorateur.
 ' sNomCompletFichier : Chemin complet du fichier.
@@ -722,6 +750,27 @@ Public Sub RenommeFichier(sCheminFichier, sNomNouveauFichier)
     sCheminCompletFichier = DossierParent(sCheminFichier)
     objFSO.MoveFile sCheminFichier , sCheminCompletFichier & "\" & sNomNouveauFichier    ' renomme
     ' objFSO.MoveFile "D:\Bubu renommé.txt" , "D:\PERSONNEL\"  ' déplace
+
+End Sub
+
+
+'------------------------------------------------------------------------------
+' Nom                     : CreerFichier
+' Description             : Crée un fichier texte dans le dossier précisé dans le chemin du fichier
+' strCheminCompletFichier : Chemin complet du fichier à créer.
+'------------------------------------------------------------------------------
+
+Sub CreerFichier(strCheminCompletFichier)
+
+  On error resume next
+  Dim objFSO, objFichierTest
+
+  Set objFSO    = CreateObject("Scripting.FileSystemObject")
+  set objFichierTest   = objFSO.CreateTextFile(strCheminCompletFichier)
+  If Err.Number <> 0 Then
+      WScript.Echo "Erreur lors de l'appel de la fonction CreateTextFile." & vbNewLine & " (Numéro: " & Err.Number & ", Description: " & Err.Description & ")"
+      Err.Clear
+  End If
 
 End Sub
 
