@@ -33,11 +33,12 @@ Contient les fonctions que j'ai créées.
 - AdresseMAC : Renvoie l'adresse MAC.
 - RenommeFichier : Renomme le fichier passé en paramètre
 - ModeleOrdinateur : Renvoie le modèle de l'ordinateur
+- NomOrdinateur : Renvoie le nom de l'ordinateur
 - SelectionneFichierDansExplorateur : Met le fichier en surbrillance dans l'explorateur.
 - AfficheDansExplorateur : Ouvre le dossier spécifié dans l'explorateur Windows.
 - AfficheDansExplorateur2 : Ouvre le dossier spécifié dans l'explorateur Windows.
 - CloseExplorerWindow : Ferme le dossier spécifié dans l'explorateur Windows.
-
+- CreerFichier : Crée un fichier texte dans le dossier précisé dans le chemin du fichier
 
 
 **À faire :**
