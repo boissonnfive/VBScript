@@ -4,49 +4,57 @@
 
 ### Imposer la déclaration des variables ###
 
-    Option Explicit
+```vb
+Option Explicit
+```
 
 ### Gérer les exceptions soi-même ###
 
-    ' Empêche les erreurs de s'afficher (à supprimer lors du débogage)
-    ' Doit être ajouté dans chaque routine
-    On Error Resume Next
-
+```vb
+' Empêche les erreurs de s'afficher (à supprimer lors du débogage)
+' Doit être ajouté dans chaque routine
+On Error Resume Next
+```
 
 ### Mettre en commentaires (') ###
 
 Tout code placé entre un `'` et une fin de ligne est considéré comme un commentaire.
 
-    ' Un commentaire d'introduction
-    Err.Clear   ' Un commentaire de fin de ligne.
-    ' If Err.Number <> 0 Then ' Un code mis en commentaires
-
+```vb
+' Un commentaire d'introduction
+Err.Clear   ' Un commentaire de fin de ligne.
+' If Err.Number <> 0 Then ' Un code mis en commentaires
+```
 
 ### Déclaration et utilisation des variables (Dim et =) ###
 
-    Option Explicit ' Force la déclaration des variables
-    Dim maVariable
-    maVariable = "Bruno" ' Une chaîne de caractères
-    maVariable = 4       ' Un nombre
-    maVariable = Now()   ' Date et heure du jour
-    maVariable = 2+3*24  ' Affectation du résultat de 2+3*24 à maVariable
-
+```vb
+Option Explicit ' Force la déclaration des variables
+Dim maVariable
+maVariable = "Bruno" ' Une chaîne de caractères
+maVariable = 4       ' Un nombre
+maVariable = Now()   ' Date et heure du jour
+maVariable = 2+3*24  ' Affectation du résultat de 2+3*24 à maVariable
+```
 
 ### Les types des variables
 
-    Dim ArrayVar(4), MyType
-    NullVar = Null   ' Assign Null value.
-    
-    MyType = TypeName("VBScript")   ' Returns "String".
-    WScript.Echo "MyType = " & MyType
-    MyType = TypeName(4)            ' Returns "Integer".
-    WScript.Echo "MyType = " & MyType
-    MyType = TypeName(37.50)        ' Returns "Double".
-    WScript.Echo "MyType = " & MyType
-    MyType = TypeName(NullVar)      ' Returns "Null".
-    WScript.Echo "MyType = " & MyType
-    MyType = TypeName(ArrayVar)     ' Returns "Variant()".
-    WScript.Echo "MyType = " & MyType
+
+```vb
+Dim ArrayVar(4), MyType
+NullVar = Null   ' Assign Null value.
+
+MyType = TypeName("VBScript")   ' Returns "String".
+WScript.Echo "MyType = " & MyType
+MyType = TypeName(4)            ' Returns "Integer".
+WScript.Echo "MyType = " & MyType
+MyType = TypeName(37.50)        ' Returns "Double".
+WScript.Echo "MyType = " & MyType
+MyType = TypeName(NullVar)      ' Returns "Null".
+WScript.Echo "MyType = " & MyType
+MyType = TypeName(ArrayVar)     ' Returns "Variant()".
+WScript.Echo "MyType = " & MyType
+```
 
 
 ### Les noms des variables
@@ -69,14 +77,15 @@ Tout code placé entre un `'` et une fin de ligne est considéré comme un comme
 - Taille d'un tableau : nTaille = UBound(Tableau) (taille vaut 11)
 
 
-    Marc = Array("garçon", "lunettes", "bruns")
-    Marine = Array("fille", "lunettes", "bruns")
-    Bruno = Array("garçon", "pas de lunettes", "bruns")
-    
-    Suspects = Array(Marc, Marine, Bruno)
-    
-    Coupable = Suspects(Random(3))
+```vb
+Marc = Array("garçon", "lunettes", "bruns")
+Marine = Array("fille", "lunettes", "bruns")
+Bruno = Array("garçon", "pas de lunettes", "bruns")
 
+Suspects = Array(Marc, Marine, Bruno)
+
+Coupable = Suspects(Random(3))
+```
 
 
 ### Les constantes ###
