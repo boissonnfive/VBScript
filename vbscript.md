@@ -105,6 +105,16 @@ Coupable = Suspects(Random(3))
 *NOTE: on préfixera le nom d'un objet par obj ou o (ex: objWShell, oWShell)*
 
 
+### Les opérateurs de comparaison ###
+
+- = : égal
+- <> : différent
+- > : supérieur
+- < : inférieur
+- >= : supérieur ou égal
+- <= : inférieur ou égal
+
+
 ### Conditions (If/Then/Else/End If) ###
 
     If (expression1) Then
