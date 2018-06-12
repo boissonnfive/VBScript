@@ -8,38 +8,145 @@
 
 
 
-'+----------------------------------------------------------------------------+
-'|                               TESTS                                        |
-'+----------------------------------------------------------------------------+
-
-
-' DateDerniereModification()
-
-' AfficheInfosDisques()
-
-' SupprimeHTMLDuFichier(cheminFichier)
-
-' Dim contenu
-' contenu = LitFichier("C:\Users\Bruno\Dropbox\En cours\vbscript\Test_hote_du_script.vbs")
-' WScript.echo "Contenu du fichier Test_hote_du_script.vbs : " & vbCRLF & contenu
-
-' Beep()
-' Bip()
-' Biip()
-' AfficheDansExplorateur("C:\Users\Bruno\Dropbox\En cours\batch\Conversion_cp850")
-' AfficheDansExplorateur2("C:\Users\Bruno\Dropbox\En cours\batch\Conversion_cp850")
-' Parle("Bonjour Bruno. Tu es vraiment le meilleur !")
-
-' Dim chemin
-' chemin = DossierParent("C:\Users\Bruno\Dropbox\En cours\batch\Conversion_cp850")
-' WScript.echo "Dossier parent de ""C:\Users\Bruno\Dropbox\En cours\batch\Conversion_cp850"" :" & vbCRLF & chemin 
 
 
 
 '+----------------------------------------------------------------------------+
-'|                            FONCTIONS                                       |
+'|                              FICHIERS                                      |
 '+----------------------------------------------------------------------------+
 
+
+
+'------------------------------------------------------------------------------
+' Nom            : InfosFichier
+' Description    : Affiche les infos du fichier (nom, extension, etc...)
+' sCheminFichier : Chemin du fichier.
+'------------------------------------------------------------------------------
+
+Public Sub InfosFichier(sCheminFichier)
+
+    Set objFSO = CreateObject("Scripting.FileSystemObject")
+    Set objFile = objFSO.GetFile(sCheminFichier)
+
+    Wscript.Echo "Absolute path  : " & objFSO.GetAbsolutePathName(objFile)
+    Wscript.Echo "Parent folder  : " & objFSO.GetParentFolderName(objFile) 
+    Wscript.Echo "File name      : " & objFSO.GetFileName(objFile)
+    Wscript.Echo "Base name      : " & objFSO.GetBaseName(objFile)
+    Wscript.Echo "Extension name : " & objFSO.GetExtensionName(objFile)
+
+End Sub
+
+
+'------------------------------------------------------------------------------
+' Nom                     : CreerFichier
+' Description             : Crée un fichier texte dans le dossier précisé dans le chemin du fichier
+' sCheminCompletFichier   : Chemin complet du fichier à créer.
+'------------------------------------------------------------------------------
+
+Sub CreerFichier(sCheminCompletFichier)
+
+  On error resume next
+  Dim objFSO, objFichierTest
+
+  Set objFSO    = CreateObject("Scripting.FileSystemObject")
+  set objFichierTest   = objFSO.CreateTextFile(sCheminCompletFichier)
+  If Err.Number <> 0 Then
+      WScript.Echo "Erreur lors de l'appel de la fonction CreateTextFile." & vbNewLine & " (Numéro: " & Err.Number & ", Description: " & Err.Description & ")"
+      Err.Clear
+  End If
+
+End Sub
+
+
+'------------------------------------------------------------------------------
+' Nom                     : CopieFichier
+' Description             : Copie un fichier dans le dossier spécifié
+' sCheminCompletFichier   : Chemin complet du fichier à copier.
+' sDossierDestination     : Chemin complet du dossier de destination.
+' Remarques               : Ne pas oublier le "\" à la fin du chemin du dossier.
+'------------------------------------------------------------------------------
+
+Public Sub CopieFichier(sCheminCompletFichier, sDossierDestination)
+    Dim objFSO
+    Set objFSO = CreateObject("Scripting.FileSystemObject")
+    objFSO.CopyFile sCheminCompletFichier , sDossierDestination
+    If Err.Number <> 0 Then
+      WScript.Echo "Erreur lors de l'appel de la fonction CopieFichier." & vbNewLine & " (Numéro: " & Err.Number & ", Description: " & Err.Description & ")"
+      Err.Clear
+    End If
+    Set objFSO = Nothing
+End Sub
+
+
+'------------------------------------------------------------------------------
+' Nom                     : DeplaceFichier
+' Description             : Déplace un fichier dans le dossier spécifié
+' sCheminFichier          : Chemin complet du fichier à copier.
+' sDossierDestination     : Chemin complet du dossier de destination.
+' Remarques               : Ne pas oublier le "\" à la fin du chemin du dossier.
+'------------------------------------------------------------------------------
+
+Public Sub DeplaceFichier(sCheminFichier, sDossierDestination)
+    Dim objFSO
+    Set objFSO = CreateObject("Scripting.FileSystemObject")
+    objFSO.MoveFile sCheminFichier , sDossierDestination
+    If Err.Number <> 0 Then
+      WScript.Echo "Erreur lors de l'appel de la fonction DeplaceFichier." & vbNewLine & " (Numéro: " & Err.Number & ", Description: " & Err.Description & ")"
+      Err.Clear
+    End If
+    Set objFSO = Nothing
+End Sub
+
+
+'------------------------------------------------------------------------------
+' Nom                : RenommeFichier
+' Description        : Renomme le fichier passé en paramètre
+' sCheminFichier     : Chemin du fichier à renommer.
+' sNomNouveauFichier : Chemin du fichier à renommer.
+'------------------------------------------------------------------------------
+
+Public Sub RenommeFichier(sCheminFichier, sNomNouveauFichier)
+
+    Dim objFSO, sCheminCompletFichier
+    Set objFSO = CreateObject("Scripting.FileSystemObject")
+
+    sCheminCompletFichier = DossierParent(sCheminFichier)
+    objFSO.MoveFile sCheminFichier , sCheminCompletFichier & "\" & sNomNouveauFichier
+
+End Sub
+
+
+'------------------------------------------------------------------------------
+' Nom           : DateDerniereModificationFichier
+' Description   : Renvoie la date de dernière modification du fichier (au format JJ/MM/AAAA)
+' filespec      : Chemin complet du fichier
+' Retour        : La date de dernière modification du fichier (au format JJ/MM/AAAA)
+'------------------------------------------------------------------------------
+
+Function DateDerniereModificationFichier(filespec)
+   On Error Resume Next ' Emp�che les erreurs de s'afficher (� supprimer lors du d�bogage)
+   Dim objFSO, objFile, retour, strErrMsg, result
+   Set objFSO = CreateObject("Scripting.FileSystemObject")
+   Set objFile = objFSO.GetFile(filespec)
+   If Err.Number <> 0 Then
+      strErrMsg = "Erreur lors de l'appel de la fonction GetFile." & vbNewLine & "(Num�ro: " & Err.Number & ", Description: " & Err.Description & ")"
+      Err.Clear
+      result = MsgBox (strErrMsg, vbOKOnly+vbExclamation, "DateDerniereModificationFichier.vbs")
+   Else
+      retour = FormatDateTime(objFile.DateLastModified, 2) ' vbShortDate - 2 - Display a date using the short date format specified in your computer's regional settings.
+   End If
+   Set objFSO = Nothing
+   Set objFile = Nothing
+   DateDerniereModificationFichier = retour
+End Function
+
+
+
+
+
+'+----------------------------------------------------------------------------+
+'|                              DOSSIERS                                      |
+'+----------------------------------------------------------------------------+
 
 
 '------------------------------------------------------------------------------
@@ -51,12 +158,124 @@
 
 Function DossierParent(cheminFichierOuDossier)
     Dim objFSO
-
     Set objFSO = CreateObject("Scripting.FileSystemObject")
-    
     DossierParent = objFSO.GetParentFolderName(cheminFichierOuDossier)
-
 End Function
+
+
+'------------------------------------------------------------------------------
+' Nom            : TermineCheminParBarreOblique
+' Description    : Ajoute une barre oblique à la fin du chemin si nécessaire.
+' sCheminFichier : Chemin du fichier.
+'------------------------------------------------------------------------------
+
+Public Sub TermineCheminParBarreOblique(sCheminFichier)
+  ' On ajoute une barre oblique inversée au cas où il n'y en aurait pas
+  fin = Right(sCheminFichier, 1)
+  if fin = "\" Then
+    ' CheminDossierParent = strCheminDossierParent
+  Else
+    sCheminFichier = sCheminFichier  & "\" 
+  End If
+End Sub
+
+
+'------------------------------------------------------------------------------
+' Nom                     : CreeDossier
+' Description             : Crée un dossier à partir du chemin contenu dans son nom.
+' sCheminDossier          : Chemin complet du dossier à créer.
+'------------------------------------------------------------------------------
+
+Public Sub CreeDossier(sCheminDossier)
+  Dim objFSO
+    Set objFSO = CreateObject("Scripting.FileSystemObject")
+    objFSO.CreateFolder sCheminDossier
+    If Err.Number <> 0 Then
+      WScript.Echo "Erreur lors de l'appel de la fonction CreeDossier." & vbNewLine & " (Numéro: " & Err.Number & ", Description: " & Err.Description & ")"
+      Err.Clear
+    End If
+    Set objFSO = Nothing
+end sub
+
+
+'------------------------------------------------------------------------------
+' Nom            : RenommeDossier
+' Description    : Renomme le dossier spécifié avec le nom spécifié.
+' sCheminDossier : Chemin complet du dossier.
+' sNouveauNom    : Nouveau nom du dossier.
+'------------------------------------------------------------------------------
+
+Sub RenommeDossier(sCheminDossier, sNouveauNom)
+    Dim objFSO
+    Set objFSO = CreateObject("Scripting.FileSystemObject")
+    objFSO.MoveFolder sCheminDossier , objFSO.GetParentFolderName(sCheminDossier) & "\" & sNouveauNom
+    set objFSO = Nothing
+End sub
+
+
+'------------------------------------------------------------------------------
+' Nom            : DeplaceDossier
+' Description    : Déplace le dossier spécifié dans le dossier destination spécifié.
+' sCheminDossier : Chemin complet du dossier à déplacer.
+' sCheminDossierDestinationAvecAntiSlash : Chemin complet du dossier destination.
+'------------------------------------------------------------------------------
+
+Sub DeplaceDossier(sCheminDossier, sCheminDossierDestinationAvecAntiSlash)
+    Dim objFSO
+    Set objFSO = CreateObject("Scripting.FileSystemObject")
+    objFSO.MoveFolder sCheminDossier , sCheminDossierDestinationAvecAntiSlash
+    set objFSO = Nothing
+End sub
+
+
+'------------------------------------------------------------------------------
+' Nom            : DossierEstVide
+' Description    : Dit si un dossier est vide ou pas
+' sCheminDossier : Chemin complet du dossier
+' retour         : Renvoie True si le dossier est vide, False sinon
+'------------------------------------------------------------------------------
+
+Public Function DossierEstVide(sCheminDossier)
+
+    Dim objFSO, objFolder, retour
+    retour = False
+    'Set sCheminDossier = "C:\Documents and Settings\Marine Coite\Bureau\eMule\Temp"
+    Set objFSO = CreateObject("Scripting.FileSystemObject")
+    Set objFolder = objFSO.GetFolder(sCheminDossier)
+    'Wscript.Echo objFolder.Size
+    
+    If objFolder.Size Then
+        'Wscript.Echo "Le dossier " & strCheminCompletDossier & " n'est pas vide."
+        retour = False
+    Else
+        'Wscript.Echo "Le dossier " & strCheminCompletDossier & " est vide."
+        retour = True
+    End If
+    
+    Set objFSO = Nothing
+    Set objFolder = Nothing
+    DossierEstVide = retour
+End Function
+
+
+'------------------------------------------------------------------------------
+' Nom            : MetALaCorbeille
+' Description    : Mets l'élément spécifié à la corbeille.
+' sCheminComplet : Chemin complet dde l'élément.
+'------------------------------------------------------------------------------
+
+Sub MetALaCorbeille(sCheminComplet)
+  Dim oShellApp, dossier
+  set oShellApp = WScript.CreateObject("Shell.Application")
+  set dossier = oShellApp.Namespace(0).ParseName(sCheminComplet) 'Namespace(0) = Bureau
+  dossier.InvokeVerb("delete")
+  Set oShellApp = Nothing
+end sub
+
+
+'+----------------------------------------------------------------------------+
+'|                               DISQUES                                      |
+'+----------------------------------------------------------------------------+
 
 
 
@@ -67,22 +286,61 @@ End Function
 '------------------------------------------------------------------------------
 
 Public sub AfficheInfosDisques()
-
     Set FSys = CreateObject("Scripting.FileSystemObject")
     Set AllDrives = FSys.Drives
     On Error Resume Next
     For Each iDrive In Alldrives
-    s = s & "Lecteur " & iDrive.DriveLetter & " : - "
-    s = s & iDrive.VolumeName & vbCrLf
-    s = s & "Espace libre : " & FormatNumber(iDrive.FreeSpace/1024,  0)
-    s = s & "Ko" & vbCrLf
-    s = s & "System de fichier : " & iDrive.FileSystem
-    s = s & vbCrLf
+        s = s & "Lecteur " & iDrive.DriveLetter & " : - "
+        s = s & iDrive.VolumeName & vbCrLf
+        s = s & "Espace libre : " & FormatNumber(iDrive.FreeSpace/1024,  0)
+        s = s & "Ko" & vbCrLf
+        s = s & "System de fichier : " & iDrive.FileSystem
+        s = s & vbCrLf
     Next
     MsgBox s
-
+    Set FSys = Nothing
 End Sub
 
+
+'------------------------------------------------------------------------------
+' Nom           : DisqueEstMonte
+' Description   : Dit si un disque est monté
+' sLettreDisque : Lettre correspondant au disque à tester
+' retour        : Renvoie True si le disque est monté, False sinon
+'------------------------------------------------------------------------------
+
+Function DisqueEstMonte(sLettreDisque)
+    Set FSys = CreateObject("Scripting.FileSystemObject")
+    Set Drive = FSys.GetDrive(sLettreDisque & ":")
+    DisqueEstMonte = Drive.IsReady
+    Set FSys = Nothing
+End Function
+
+
+
+
+'+----------------------------------------------------------------------------+
+'|                         LECTURE/ECRITURE                                   |
+'+----------------------------------------------------------------------------+
+
+
+
+'------------------------------------------------------------------------------
+' Nom           : LitFichier
+' Description   : Lit le contenu d'un fichier
+' cheminFichier : le nom complet du fichier à lire
+' retour        : Renvoie le contenu du fichier
+'------------------------------------------------------------------------------
+
+Function LitFichier(cheminFichier)
+    Dim strFileContents
+    ' Read the total content of the html file and put it in strFileContents
+    Set objFSO = CreateObject("Scripting.FileSystemObject")
+    Set objTS = objFSO.OpenTextFile(cheminFichier)
+    strFileContents = objTS.ReadAll
+    objTS.Close
+    LitFichier = strFileContents
+End Function
 
 
 Public sub SupprimeHTMLDuFichier(cheminFichier)
@@ -119,235 +377,11 @@ End Sub
 '------------------------------------------------------------------------------
 
 Function StripHTML(sTexteHTML)
-Dim oReg
+  Dim oReg
     Set oReg = CreateObject("VBScript.RegExp")
     oReg.Pattern = "(<[^>]+>)"
     oReg.Global = True
     StripHTML = oReg.Replace(sTexteHTML, vbNullString)
-End Function
-
-
-'------------------------------------------------------------------------------
-' Nom           : LitFichier
-' Description   : Lit le contenu d'un fichier
-' cheminFichier : le nom complet du fichier à lire
-' retour        : Renvoie le contenu du fichier
-'------------------------------------------------------------------------------
-
-Function LitFichier(cheminFichier)
-    Dim strFileContents
-    ' Read the total content of the html file and put it in strFileContents
-    Set objFSO = CreateObject("Scripting.FileSystemObject")
-    Set objTS = objFSO.OpenTextFile(cheminFichier)
-    strFileContents = objTS.ReadAll
-    objTS.Close
-    LitFichier = strFileContents
-End Function
-
-
-'------------------------------------------------------------------------------
-' Nom         : Beep
-' Description : Emet un son d'erreur Windows.
-'------------------------------------------------------------------------------
-
-Public Sub Beep()
-   On Error Resume Next
-   Dim objVoice, objSpFileStream
-   
-   Set objVoice        = CreateObject("SAPI.SpVoice")
-   Set objSpFileStream = CreateObject("SAPI.SpFileStream")
-   
-   objSpFileStream.Open "C:\Windows\Media\Windows Error.wav"
-   objVoice.SpeakStream objSpFileStream
-   objSpFileStream.Close
-
-   Set objVoice        = Nothing
-   Set objSpFileStream = Nothing
-End Sub
-
-'------------------------------------------------------------------------------
-' Nom         : Bip
-' Description : Émet le son d'alerte Windows par défaut (ce n'est pas un bip).
-' Remarque    : Ne fonctionne que si le script est lancé par cscript
-'------------------------------------------------------------------------------
-
-Sub Bip
-   WScript.Echo Chr(7)
-End Sub
-
-'------------------------------------------------------------------------------
-' Nom         : Biip
-' Description : Émet le son d'alerte Windows par défaut (ce n'est pas un bip).
-'------------------------------------------------------------------------------
-
-Sub Biip
-   CreateObject("WScript.Shell").Run "%comspec% /K echo " & Chr(07),0  'O: cache la fenêtre
-End Sub
-
-
-'------------------------------------------------------------------------------
-' Nom           : AfficheDansExplorateur
-' Description   : Ouvre le dossier spécifié dans l'explorateur Windows.
-' cheminDossier : Chemin complet du dossier.
-'------------------------------------------------------------------------------
-
-Public sub AfficheDansExplorateur(cheminDossier)
-    ' On Error Resume Next
-    Dim objShell, strExplorerPath
-    Set objShell = CreateObject("Wscript.Shell")
-    If Err.Number <> 0 Then
-		    WScript.Echo "Erreur lors de la création de l'objet WScript.Shell." & vbNewLine & " (Numéro: " & Err.Number & ", Description: " & Err.Description & ")"
-		    ' Err.Clear
-    Else
-		    strExplorerPath = "explorer.exe /e," & cheminDossier
-    	  objShell.Run strExplorerPath
-        Set objShell = Nothing
-    End If
-end sub
-
-
-'------------------------------------------------------------------------------
-' Nom           : AfficheDansExplorateur2
-' Description   : Ouvre une fenêtre Explorateur Windows du dossier.
-' cheminDossier : Chemin complet du dossier.
-'------------------------------------------------------------------------------
-
-public sub AfficheDansExplorateur2(cheminDossier)
-   On Error Resume Next
-   dim objShell
-   set objShell = CreateObject("shell.application")
-   if Err.Number <> 0 then
-      WScript.Echo "Erreur lors de la création de l'objet shell.application." & vbNewLine & " (Numéro: " & Err.Number & ", Description: " & Err.Description & ")"
-      Err.Clear
-   else
-      objShell.Explore(cheminDossier)
-      set objShell = nothing
-   end if
-end sub
-
-
-'------------------------------------------------------------------------------
-' Nom           : Parle
-' Description   : Fait dire le texte en paramètre par l'ordinateur.
-' strTexte      : Texte à faire parler par l'ordinateur.
-'------------------------------------------------------------------------------
-
-Public Sub Parle(strTexte)
-	CreateObject("SAPI.SpVoice").Speak strTexte
-	' objVoice.Rate = 8 ' accélère le rythme du phrasé.
-	' objVoice.Volume = 60
-End Sub
-
-
-
-'------------------------------------------------------------------------------
-' Nom           : DateDerniereModificationFichier
-' Description   : Renvoie la date de dernière modification du fichier (au format JJ/MM/AAAA)
-' filespec      : Chemin complet du fichier
-' Retour        : La date de dernière modification du fichier (au format JJ/MM/AAAA)
-'------------------------------------------------------------------------------
-
-Function DateDerniereModificationFichier(filespec)
-   On Error Resume Next ' Emp�che les erreurs de s'afficher (� supprimer lors du d�bogage)
-   Dim objFSO, objFile, retour, strErrMsg, result
-   Set objFSO = CreateObject("Scripting.FileSystemObject")
-   Set objFile = objFSO.GetFile(filespec)
-   If Err.Number <> 0 Then
-      strErrMsg = "Erreur lors de l'appel de la fonction GetFile." & vbNewLine & "(Num�ro: " & Err.Number & ", Description: " & Err.Description & ")"
-      Err.Clear
-      result = MsgBox (strErrMsg, vbOKOnly+vbExclamation, "DateDerniereModificationFichier.vbs")
-   Else
-      retour = FormatDateTime(objFile.DateLastModified, 2) ' vbShortDate - 2 - Display a date using the short date format specified in your computer's regional settings.
-   End If
-   Set objFSO = Nothing
-   Set objFile = Nothing
-   DateDerniereModificationFichier = retour
-End Function
-
-
-
-'------------------------------------------------------------------------------
-' Nom           : DisqueEstMonte
-' Description   : Dit si un disque est monté
-' sLettreDisque : Lettre correspondant au disque à tester
-' retour        : Renvoie True si le disque est monté, False sinon
-'------------------------------------------------------------------------------
-
-Function DisqueEstMonte(sLettreDisque)
-
-    Set FSys = CreateObject("Scripting.FileSystemObject")
-    Set Drive = FSys.GetDrive(sLettreDisque & ":")
-    DisqueEstMonte = Drive.IsReady
-
-End Function
-
-
-'------------------------------------------------------------------------------
-' Nom            : InfosFichier
-' Description    : Affiche les infos du fichier (nom, extension, etc...)
-' sCheminFichier : Chemin du fichier.
-'------------------------------------------------------------------------------
-
-Public Sub InfosFichier(sCheminFichier)
-
-    Set objFSO = CreateObject("Scripting.FileSystemObject")
-    Set objFile = objFSO.GetFile(sCheminFichier)
-
-    Wscript.Echo "Absolute path  : " & objFSO.GetAbsolutePathName(objFile)
-    Wscript.Echo "Parent folder  : " & objFSO.GetParentFolderName(objFile) 
-    Wscript.Echo "File name      : " & objFSO.GetFileName(objFile)
-    Wscript.Echo "Base name      : " & objFSO.GetBaseName(objFile)
-    Wscript.Echo "Extension name : " & objFSO.GetExtensionName(objFile)
-
-End Sub
-
-
-'------------------------------------------------------------------------------
-' Nom            : TermineCheminParBarreOblique
-' Description    : Ajoute une barre oblique à la fin du chemin si nécessaire.
-' sCheminFichier : Chemin du fichier.
-'------------------------------------------------------------------------------
-
-Public Sub TermineCheminParBarreOblique(sCheminFichier)
-
-  ' On ajoute une barre oblique inversée au cas où il n'y en aurait pas
-  fin = Right(sCheminFichier, 1)
-  if fin = "\" Then
-    ' CheminDossierParent = strCheminDossierParent
-  Else
-    sCheminFichier = sCheminFichier  & "\" 
-  End If
-
-End Sub
-
-
-'------------------------------------------------------------------------------
-' Nom            : DossierEstVide
-' Description    : Dit si un dossier est vide ou pas
-' sCheminDossier : Chemin complet du dossier
-' retour         : Renvoie True si le dossier est vide, False sinon
-'------------------------------------------------------------------------------
-
-Public Function DossierEstVide(sCheminDossier)
-
-    Dim objFSO, objFolder, retour
-    retour = False
-    'Set sCheminDossier = "C:\Documents and Settings\Marine Coite\Bureau\eMule\Temp"
-    Set objFSO = CreateObject("Scripting.FileSystemObject")
-    Set objFolder = objFSO.GetFolder(sCheminDossier)
-    'Wscript.Echo objFolder.Size
-    
-    If objFolder.Size Then
-        'Wscript.Echo "Le dossier " & strCheminCompletDossier & " n'est pas vide."
-        retour = False
-    Else
-        'Wscript.Echo "Le dossier " & strCheminCompletDossier & " est vide."
-        retour = True
-    End If
-    
-    Set objFSO = Nothing
-    Set objFolder = Nothing
-    DossierEstVide = retour
 End Function
 
 
@@ -479,6 +513,14 @@ Sub Banniere(ByVal sMessage, ByVal nLargeurBanniere)
 End Sub
 
 
+
+
+'+----------------------------------------------------------------------------+
+'|                              INTERNET                                      |
+'+----------------------------------------------------------------------------+
+
+
+
 '------------------------------------------------------------------------------
 ' Nom            : AdresseIP
 ' Description    : Renvoie l'adresse IP.
@@ -547,15 +589,23 @@ public function AdresseMAC()
 end function
 
 
+
+
+'+----------------------------------------------------------------------------+
+'|                             ORDINATEUR                                     |
+'+----------------------------------------------------------------------------+
+
+
+
+
 '------------------------------------------------------------------------------
 ' Nom         : ModeleOrdinateur
 ' Description : Renvoie le modèle de l'ordinateur
 ' retour      : Le modèle de l'ordinateur
 '------------------------------------------------------------------------------
 
-Function ModeleOrdinateur()
- 
-   ' Déclaration des variables obligatoire
+function ModeleOrdinateur()
+  ' Déclaration des variables obligatoire
   Dim SystemName, objComputerSystem, ordinateur, retour
   SystemName = "localhost"
   
@@ -569,7 +619,7 @@ Function ModeleOrdinateur()
   Set ordinateur        = Nothing
   ModeleOrdinateur      = retour
    
-End Function
+end function
 
 
 '------------------------------------------------------------------------------
@@ -598,6 +648,79 @@ function NomOrdinateur()
 end function
 
 
+
+
+'+----------------------------------------------------------------------------+
+'|                            EXPLORATEUR                                     |
+'+----------------------------------------------------------------------------+
+
+
+
+
+
+'------------------------------------------------------------------------------
+' Nom           : AfficheDansExplorateur
+' Description   : Ouvre le dossier spécifié dans l'explorateur Windows.
+' cheminDossier : Chemin complet du dossier.
+'------------------------------------------------------------------------------
+
+Public sub AfficheDansExplorateur(cheminDossier)
+    ' On Error Resume Next
+    Dim objShell, strExplorerPath
+    Set objShell = CreateObject("Wscript.Shell")
+    If Err.Number <> 0 Then
+        ' WScript.Echo "Erreur lors de la création de l'objet WScript.Shell." & vbNewLine & " (Numéro: " & Err.Number & ", Description: " & Err.Description & ")"
+        ' Err.Clear
+    Else
+    strExplorerPath = "explorer.exe /e," & cheminDossier
+      objShell.Run strExplorerPath, , True
+        Set objShell = Nothing
+        WScript.Sleep 1500 ' Laisse le temps à la fenêtre de s'afficher
+    End If
+end sub
+
+'------------------------------------------------------------------------------
+' Nom           : AfficheDansExplorateur2
+' Description   : Ouvre le dossier spécifié dans l'explorateur Windows.
+' cheminDossier : Chemin complet du dossier.
+'------------------------------------------------------------------------------
+
+Public sub AfficheDansExplorateur2(cheminDossier)
+    ' On Error Resume Next
+    dim objShellAPP
+    set objShellAPP = CreateObject("shell.application")
+    objShellAPP.Explore(cheminDossier)
+    set objShellAPP = Nothing
+    WScript.Sleep 1500 ' Laisse le temps à la fenêtre de s'afficher
+end sub
+
+
+'------------------------------------------------------------------------------
+' Nom           : CloseExplorerWindow
+' Description   : Ferme le dossier spécifié dans l'explorateur Windows.
+' sFolderPath   : Chemin complet du dossier.
+'------------------------------------------------------------------------------
+
+Function CloseExplorerWindow(sFolderPath)
+    Dim bTest
+
+    bTest = false
+    with createobject("shell.application")
+                
+        ' for each wndw in .windows
+        For j=0 to .windows.Count-1
+            ' if typename(wndw.document) = "IShellFolderViewDual2" then
+            
+            if lcase(.windows.Item(j).document.folder.self.path) = lcase(sFolderPath) then
+                .windows.Item(j).quit
+                bTest = err.number = 0
+            end if
+            ' end if
+        next
+    
+    end with ' shell.application
+    CloseExplorerWindow = Cstr(bTest)
+end function
 
 
 '------------------------------------------------------------------------------
@@ -669,146 +792,138 @@ Public Sub SelectionneFichierDansExplorateur(sNomCompletFichier)
 end Sub
 
 
-'------------------------------------------------------------------------------
-' Nom           : AfficheDansExplorateur
-' Description   : Ouvre le dossier spécifié dans l'explorateur Windows.
-' cheminDossier : Chemin complet du dossier.
-'------------------------------------------------------------------------------
-
-Public sub AfficheDansExplorateur(cheminDossier)
-    ' On Error Resume Next
-    Dim objShell, strExplorerPath
-    Set objShell = CreateObject("Wscript.Shell")
-    If Err.Number <> 0 Then
-        ' WScript.Echo "Erreur lors de la création de l'objet WScript.Shell." & vbNewLine & " (Numéro: " & Err.Number & ", Description: " & Err.Description & ")"
-        ' Err.Clear
-    Else
-    strExplorerPath = "explorer.exe /e," & cheminDossier
-      objShell.Run strExplorerPath, , True
-        Set objShell = Nothing
-        WScript.Sleep 1500 ' Laisse le temps à la fenêtre de s'afficher
-    End If
-end sub
-
-'------------------------------------------------------------------------------
-' Nom           : AfficheDansExplorateur2
-' Description   : Ouvre le dossier spécifié dans l'explorateur Windows.
-' cheminDossier : Chemin complet du dossier.
-'------------------------------------------------------------------------------
-
-Public sub AfficheDansExplorateur2(cheminDossier)
-    ' On Error Resume Next
-    dim objShellAPP
-    set objShellAPP = CreateObject("shell.application")
-    objShellAPP.Explore(cheminDossier)
-    set objShellAPP = Nothing
-    WScript.Sleep 1500 ' Laisse le temps à la fenêtre de s'afficher
-end sub
 
 
-'------------------------------------------------------------------------------
-' Nom           : CloseExplorerWindow
-' Description   : Ferme le dossier spécifié dans l'explorateur Windows.
-' sFolderPath   : Chemin complet du dossier.
-'------------------------------------------------------------------------------
-
-Function CloseExplorerWindow(sFolderPath)
-    Dim bTest
-
-    bTest = false
-    with createobject("shell.application")
-                
-        ' for each wndw in .windows
-        For j=0 to .windows.Count-1
-            ' if typename(wndw.document) = "IShellFolderViewDual2" then
-            
-            if lcase(.windows.Item(j).document.folder.self.path) = lcase(sFolderPath) then
-                .windows.Item(j).quit
-                bTest = err.number = 0
-            end if
-            ' end if
-        next
-    
-    end with ' shell.application
-    CloseExplorerWindow = Cstr(bTest)
-end function
+'+----------------------------------------------------------------------------+
+'|                               DIVERS                                       |
+'+----------------------------------------------------------------------------+
 
 
 
 '------------------------------------------------------------------------------
-' Nom                : RenommeFichier
-' Description        : Renomme le fichier passé en paramètre
-' sCheminFichier     : Chemin du fichier à renommer.
-' sNomNouveauFichier : Chemin du fichier à renommer.
+' Nom         : Beep
+' Description : Emet un son d'erreur Windows.
 '------------------------------------------------------------------------------
 
-Public Sub RenommeFichier(sCheminFichier, sNomNouveauFichier)
+Public Sub Beep()
+   On Error Resume Next
+   Dim objVoice, objSpFileStream
+   
+   Set objVoice        = CreateObject("SAPI.SpVoice")
+   Set objSpFileStream = CreateObject("SAPI.SpFileStream")
+   
+   objSpFileStream.Open "C:\Windows\Media\Windows Error.wav"
+   objVoice.SpeakStream objSpFileStream
+   objSpFileStream.Close
 
-    Dim objFSO, sCheminCompletFichier
-    Set objFSO = CreateObject("Scripting.FileSystemObject")
-
-    sCheminCompletFichier = DossierParent(sCheminFichier)
-    objFSO.MoveFile sCheminFichier , sCheminCompletFichier & "\" & sNomNouveauFichier    ' renomme
-    ' objFSO.MoveFile "D:\Bubu renommé.txt" , "D:\PERSONNEL\"  ' déplace
-
+   Set objVoice        = Nothing
+   Set objSpFileStream = Nothing
 End Sub
 
 
 '------------------------------------------------------------------------------
-' Nom                     : CreerFichier
-' Description             : Crée un fichier texte dans le dossier précisé dans le chemin du fichier
-' strCheminCompletFichier : Chemin complet du fichier à créer.
+' Nom         : Bip
+' Description : Émet le son d'alerte Windows par défaut (ce n'est pas un bip).
+' Remarque    : Ne fonctionne que si le script est lancé par cscript
 '------------------------------------------------------------------------------
 
-Sub CreerFichier(strCheminCompletFichier)
-
-  On error resume next
-  Dim objFSO, objFichierTest
-
-  Set objFSO    = CreateObject("Scripting.FileSystemObject")
-  set objFichierTest   = objFSO.CreateTextFile(strCheminCompletFichier)
-  If Err.Number <> 0 Then
-      WScript.Echo "Erreur lors de l'appel de la fonction CreateTextFile." & vbNewLine & " (Numéro: " & Err.Number & ", Description: " & Err.Description & ")"
-      Err.Clear
-  End If
-
+Sub Bip
+   WScript.Echo Chr(7)
 End Sub
 
 
-' ### Renommer un dossier ###
+'------------------------------------------------------------------------------
+' Nom         : Biip
+' Description : Émet le son d'alerte Windows par défaut (ce n'est pas un bip).
+'------------------------------------------------------------------------------
 
-'     Dim objFSO
-'     Set objFSO = CreateObject("Scripting.FileSystemObject")
-'     objFSO.MoveFolder "D:\PERSONNEL" , "D:\PERSO"          ' renomme
-'     objFSO.MoveFolder "D:\PERSO" , "D:\INFORMATIQUE\"      ' déplace
-
-
-' ### Vérifier qu un dossier existe ###
-
-'     strNomCompletDossier = "C:\Users\Bobo"
-'     Set objFSO = CreateObject("Scripting.FileSystemObject")
-'     If Not objFSO.FolderExists(strNomCompletDossier) Then
-'         WScript.echo "Le dossier n'existe pas"
-'         WScript.Quit
-'     End If
+Sub Biip
+   CreateObject("WScript.Shell").Run "%comspec% /K echo " & Chr(07),0  'O: cache la fenêtre
+End Sub
 
 
-' ### Vérifier qu un fichier existe ###
+'------------------------------------------------------------------------------
+' Nom           : Parle
+' Description   : Fait dire le texte en paramètre par l'ordinateur.
+' strTexte      : Texte à faire parler par l'ordinateur.
+'------------------------------------------------------------------------------
 
-'     strNomFichier = "bubu.txt"
-'     strNomCompletDossier = "C:\Users\Bobo"
-'     Set objFSO = CreateObject("Scripting.FileSystemObject")
-'     If Not objFSO.FileExists(strNomCompletDossier & "\" & strNomFichier) Then
-'         WScript.echo "Le fichier n'existe pas."
-'         WScript.Quit
-'     End If
+Public Sub Parle(strTexte)
+  CreateObject("SAPI.SpVoice").Speak strTexte
+  ' objVoice.Rate = 8 ' accélère le rythme du phrasé.
+  ' objVoice.Volume = 60
+End Sub
 
 
 
-' ------------------------------------------------------------------------
-'        FONCTIONS EXISTANTES RECODÉES PAR MOI POUR APPRENDRE
-' ------------------------------------------------------------------------
 
+
+
+'+----------------------------------------------------------------------------+
+'|                               TESTS                                        |
+'+----------------------------------------------------------------------------+
+
+
+' DateDerniereModification()
+
+' AfficheInfosDisques()
+
+' SupprimeHTMLDuFichier(cheminFichier)
+
+' Dim contenu
+' contenu = LitFichier("C:\Users\Bruno\Dropbox\En cours\vbscript\Test_hote_du_script.vbs")
+' WScript.echo "Contenu du fichier Test_hote_du_script.vbs : " & vbCRLF & contenu
+
+' Beep()
+' Bip()
+' Biip()
+' AfficheDansExplorateur("C:\Users\Bruno\Dropbox\En cours\batch\Conversion_cp850")
+' AfficheDansExplorateur2("C:\Users\Bruno\Dropbox\En cours\batch\Conversion_cp850")
+' Parle("Bonjour Bruno. Tu es vraiment le meilleur !")
+
+' Dim chemin
+' chemin = DossierParent("C:\Users\Bruno\Dropbox\En cours\batch\Conversion_cp850")
+' WScript.echo "Dossier parent de ""C:\Users\Bruno\Dropbox\En cours\batch\Conversion_cp850"" :" & vbCRLF & chemin 
+
+
+' Dim objShell, strCheminBureau, strCheminFichierTest, strCheminDossierTest
+
+' Set objShell         = CreateObject("Wscript.Shell")
+' strCheminBureau      = objShell.SpecialFolders("Desktop")
+' strCheminFichierTest = strCheminBureau & "\" & "test.txt"
+' strCheminDossierTest = strCheminBureau & "\" & "Dossier test VBScript"
+
+' CreerFichier strCheminFichierTest
+' WScript.Sleep(2000)
+' CreeDossier strCheminDossierTest
+' WScript.Sleep(2000)
+' CopieFichier strCheminFichierTest, strCheminDossierTest & "\"
+' WScript.Sleep(2000)
+' RenommeFichier strCheminFichierTest, "test2.txt"
+' WScript.Sleep(2000)
+' DeplaceFichier strCheminBureau & "\" & "test2.txt", strCheminDossierTest & "\"
+' WScript.Sleep(5000)
+' MetALaCorbeille(strCheminDossierTest & "\")
+
+
+
+
+'+----------------------------------------------------------------------------+
+'|                                 FIN                                        |
+'+----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+'+----------------------------------------------------------------------------+
+'|        FONCTIONS EXISTANTES RECODÉES PAR MOI POUR APPRENDRE                |
+'+----------------------------------------------------------------------------+
 
 ' ----
 ' NomDossierScript
