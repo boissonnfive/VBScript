@@ -704,19 +704,33 @@ end sub
 Function CloseExplorerWindow(sFolderPath)
     Dim bTest
 
-    bTest = false
+    bTest = False
+    
     with createobject("shell.application")
+        
+        ' WScript.Echo "Chemin en minuscule : " & lcase(sFolderPath)
+        
+        Do
+            bSortieBoucle = false
+            For Each wdow in .windows
+                ' if typename(wndw.document) = "IShellFolderViewDual2" then
+                ' WScript.Echo "Nombre de fenêtres : " & .windows.Count & vbCrLf & "Fenêtre en cours : " & wdow.document.folder.self.path
                 
-        ' for each wndw in .windows
-        For j=0 to .windows.Count-1
-            ' if typename(wndw.document) = "IShellFolderViewDual2" then
-            
-            if lcase(.windows.Item(j).document.folder.self.path) = lcase(sFolderPath) then
-                .windows.Item(j).quit
-                bTest = err.number = 0
-            end if
-            ' end if
-        next
+                If lcase(wdow.document.folder.self.path) = lcase(sFolderPath) Then
+                  
+                    WScript.Echo "Destruction de la fenêtre : " & wdow.document.folder.self.path
+                    wdow.quit
+                    bSortieBoucle = True
+                    bTest = err.number = 0
+                    
+                     ' On quitte la boucle for si on a détruit une fenêtre
+                     ' car il faut parcourir les fenêtres du début à nouveau
+                     ' Pour vérifier s'il n'y en a pas une autre
+                    Exit For
+                end If
+                
+            Next
+        Loop While bSortieBoucle = True
     
     end with ' shell.application
     CloseExplorerWindow = Cstr(bTest)
